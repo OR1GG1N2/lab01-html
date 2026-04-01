@@ -1,0 +1,183 @@
+/* ===== ПЕРЕМЕННЫЕ ===== */
+:root {
+  --primary: #2563eb;
+  --accent: #f59e0b;
+  --bg: #0f172a;
+  --surface: #111827;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --border: #1f2937;
+}
+
+/* ===== RESET ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ===== КОНТЕЙНЕР ===== */
+.container {
+  width: min(1100px, 100% - 40px);
+  margin: auto;
+}
+
+/* ===== HEADER ===== */
+header {
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+}
+
+nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+}
+
+nav a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: 0.3s;
+}
+
+nav a:hover::after {
+  width: 100%;
+}
+
+/* ===== ТЕКСТ ===== */
+h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  margin-top: 40px;
+  font-size: 24px;
+}
+
+p {
+  color: var(--muted);
+}
+
+/* ===== КАРТКИ ===== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 16px;
+  margin-top: 20px;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* ===== СПИСКИ ===== */
+ul, ol {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 6px;
+}
+
+/* ===== IMAGE ===== */
+img {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+th {
+  background: var(--primary);
+  padding: 12px;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+tr:nth-child(even) {
+  background: rgba(255,255,255,0.03);
+}
+
+/* ===== ФОРМА ===== */
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* ===== FLEX БЛОК (для about) ===== */
+.two-column {
+  display: flex;
+  gap: 20px;
+}
+
+.two-column > * {
+  flex: 1;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  margin-top: 60px;
+  padding: 30px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}

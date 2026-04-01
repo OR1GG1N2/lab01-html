@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
+  <link rel="stylesheet" href="./assets/styles/style.css">
+  <link rel="stylesheet" href="./assets/styles/responsive.css">
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Мій перший HTML сайт">
@@ -9,49 +12,62 @@
 <body>
 
 <header>
-  <nav>
-    <a href="index.html">Головна</a>
-    <a href="pages/about.html">Про мене</a>
-    <a href="pages/contact.html">Контакти</a>
-  </nav>
+  <div class="container">
+    <nav>
+      <a href="index.html">Головна</a>
+      <a href="pages/about.html">Про мене</a>
+      <a href="pages/contact.html">Контакти</a>
+    </nav>
+  </div>
 </header>
 
-<main>
-  <h1>Мій перший HTML-сайт</h1>
+<main class="container">
 
-  <h2>Про сайт</h2>
-  <p><strong>Це</strong> мій перший сайт.</p>
-  <p>Я вивчаю <em>HTML</em>.</p>
-  <p>Це практична робота.</p>
+  <div class="card">
+    <h1>Мій перший HTML-сайт</h1>
 
-  <h2>Список</h2>
-  <ul>
-    <li>HTML</li>
-    <li>CSS</li>
-    <li>JS</li>
-  </ul>
+    <h2>Про сайт</h2>
+    <p><strong>Це</strong> мій перший сайт.</p>
+    <p>Я вивчаю <em>HTML</em>.</p>
+    <p>Це практична робота.</p>
+  </div>
 
-  <ol>
-    <li>Крок 1</li>
-    <li>Крок 2</li>
-    <li>Крок 3</li>
-  </ol>
+  <div class="card">
+    <h2>Список</h2>
 
-  <figure>
-    <img src="assets/img/test.jpg" alt="Зображення" width="300">
-    <figcaption>Моє зображення</figcaption>
-  </figure>
+    <ul>
+      <li>HTML</li>
+      <li>CSS</li>
+      <li>JS</li>
+    </ul>
 
-  <table border="1">
-    <caption>Розклад</caption>
-    <thead>
-      <tr><th>День</th><th>Предмет</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Пн</td><td>HTML</td></tr>
-      <tr><td>Вт</td><td>CSS</td></tr>
-    </tbody>
-  </table>
+    <ol>
+      <li>Крок 1</li>
+      <li>Крок 2</li>
+      <li>Крок 3</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <figure>
+      <img src="assets/img/test.jpg" alt="Зображення">
+      <figcaption>Моє зображення</figcaption>
+    </figure>
+  </div>
+
+  <div class="card">
+    <table>
+      <caption>Розклад</caption>
+      <thead>
+        <tr><th>День</th><th>Предмет</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Пн</td><td>HTML</td></tr>
+        <tr><td>Вт</td><td>CSS</td></tr>
+      </tbody>
+    </table>
+  </div>
+
 </main>
 
 <footer>

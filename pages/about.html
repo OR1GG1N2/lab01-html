@@ -3,29 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <title>Про мене</title>
+  <link rel="stylesheet" href="../assets/styles/style.css">
+  <link rel="stylesheet" href="../assets/styles/responsive.css">
 </head>
 <body>
 
-<nav>
-  <a href="../index.html">Головна</a>
-  <a href="about.html">Про мене</a>
-  <a href="contact.html">Контакти</a>
-</nav>
+<header>
+  <div class="container">
+    <nav>
+      <a href="../index.html">Головна</a>
+      <a href="about.html">Про мене</a>
+      <a href="contact.html">Контакти</a>
+    </nav>
+  </div>
+</header>
 
-<h1>Про мене</h1>
-<p>Коротко про мене.</p>
+<main class="container">
 
-<h2>Відео</h2>
-<video controls width="400">
-  <source src="../assets/media/demo.mp4" type="video/mp4">
-  <p>Не підтримується</p>
-</video>
+  <h1>Про мене</h1>
 
-<h2>Аудіо</h2>
-<audio controls>
-  <source src="../assets/media/demo.mp3" type="audio/mpeg">
-  <p>Не підтримується</p>
-</audio>
+  <div class="two-column">
+
+    <div class="card">
+      <p>Коротко про мене.</p>
+    </div>
+
+    <div class="card">
+      <h2>Відео</h2>
+      <video controls>
+        <source src="../assets/media/demo.mp4" type="video/mp4">
+        <p>Не підтримується</p>
+      </video>
+
+      <h2>Аудіо</h2>
+      <audio controls>
+        <source src="../assets/media/demo.mp3" type="audio/mpeg">
+        <p>Не підтримується</p>
+      </audio>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  <p>&copy; 2026</p>
+</footer>
 
 </body>
 </html>
