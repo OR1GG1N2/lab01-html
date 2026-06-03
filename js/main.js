@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', init);
 
-function init() {
+async function init() {
   initActiveNav();
   initMenuToggle();
   initThemeToggle();
@@ -9,6 +9,7 @@ function init() {
   initFilters();
   initModal();
   initContactForm();
+  await initCatalogPage();
 }
 
 function initActiveNav() {
