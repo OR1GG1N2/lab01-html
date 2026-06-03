@@ -1,115 +1,150 @@
 /**
- * api.js - Асинхронные функции для работы с данными
+ * api.js - REST API функції для CRUD операцій
+ * Працює з локальним json-server на порту 3000
  */
 
-// Загрузка проектов из JSON
-async function loadProjects() {
+const API_BASE_URL = 'http://localhost:3000/items';
+
+/**
+ * GET /items - Отримати список усіх елементів
+ * @param {Object} params - Параметри запиту (q, category, _sort, _order, _page, _limit)
+ * @returns {Promise<Array>} Масив елементів
+ */
+async function getItems(params = {}) {
   try {
-    const response = await fetch('./data/projects.json');
+    const query = buildQueryString(params);
+    const url = query ? `${API_BASE_URL}?${query}` : API_BASE_URL;
+    
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Помилка при завантаженні: ${response.status}`);
     }
-    const data = await response.json();
-    return data;
+    
+    return await response.json();
   } catch (error) {
-    console.error('Помилка при завантаженні даних:', error);
+    console.error('Помилка в getItems:', error);
     throw error;
   }
 }
 
-// Получение проекта по ID
-function getProjectById(projects, id) {
-  return projects.find((project) => project.id === parseInt(id));
-}
-
-// Получение уникальных категорий
-function getCategories(projects) {
-  const categories = [...new Set(projects.map((p) => p.category))];
-  return ['all', ...categories];
-}
-
-// Фильтрация проектов по поиску и категориям
-function filterProjects(projects, searchQuery, category) {
-  return projects.filter((project) => {
-    const matchesSearch =
-      project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.technologies.some((tech) =>
-        tech.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-    const matchesCategory = category === 'all' || project.category === category;
-
-    return matchesSearch && matchesCategory;
-  });
-}
-
-// Сортировка проектов
-function sortProjects(projects, sortBy) {
-  const copy = [...projects];
-
-  switch (sortBy) {
-    case 'title-asc':
-      copy.sort((a, b) => a.title.localeCompare(b.title, 'uk'));
-      break;
-    case 'title-desc':
-      copy.sort((a, b) => b.title.localeCompare(a.title, 'uk'));
-      break;
-    case 'rating-desc':
-      copy.sort((a, b) => b.rating - a.rating);
-      break;
-    case 'rating-asc':
-      copy.sort((a, b) => a.rating - b.rating);
-      break;
-    case 'date-newest':
-      copy.sort((a, b) => new Date(b.date) - new Date(a.date));
-      break;
-    case 'date-oldest':
-      copy.sort((a, b) => new Date(a.date) - new Date(b.date));
-      break;
-    case 'level':
-      const levelOrder = { 'Новачок': 1, 'Середній': 2, 'Продвинений': 3 };
-      copy.sort((a, b) => levelOrder[a.level] - levelOrder[b.level]);
-      break;
-    default:
-      break;
-  }
-
-  return copy;
-}
-
-// Получение избранных проектов из localStorage
-function getFavorites() {
-  const stored = localStorage.getItem('projectFavorites') || '[]';
+/**
+ * GET /items/:id - Отримати один елемент за ID
+ * @param {number} id - ID елемента
+ * @returns {Promise<Object>} Об'єкт елемента
+ */
+async function getItemById(id) {
   try {
-    return JSON.parse(stored);
-  } catch {
-    return [];
+    const response = await fetch(`${API_BASE_URL}/${id}`);
+    if (!response.ok) {
+      throw new Error(`Елемент не знайдено: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Помилка в getItemById:', error);
+    throw error;
   }
 }
 
-// Сохранение избранных в localStorage
-function saveFavorites(favorites) {
-  localStorage.setItem('projectFavorites', JSON.stringify(favorites));
-}
-
-// Добавление/удаление из избранного
-function toggleFavorite(projectId) {
-  const favorites = getFavorites();
-  const index = favorites.indexOf(projectId);
-
-  if (index === -1) {
-    favorites.push(projectId);
-  } else {
-    favorites.splice(index, 1);
+/**
+ * POST /items - Створити новий елемент
+ * @param {Object} data - Дані нового елемента
+ * @returns {Promise<Object>} Новий елемент з ID від сервера
+ */
+async function createItem(data) {
+  try {
+    const response = await fetch(API_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Помилка при створенні: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Помилка в createItem:', error);
+    throw error;
   }
-
-  saveFavorites(favorites);
-  return favorites;
 }
 
-// Проверка, добавлен ли проект в избранное
-function isFavorite(projectId) {
-  const favorites = getFavorites();
-  return favorites.includes(projectId);
+/**
+ * PATCH /items/:id - Оновити елемент
+ * @param {number} id - ID елемента
+ * @param {Object} data - Дані для оновлення
+ * @returns {Promise<Object>} Оновлений елемент
+ */
+async function updateItem(id, data) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Помилка при оновленні: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Помилка в updateItem:', error);
+    throw error;
+  }
+}
+
+/**
+ * DELETE /items/:id - Видалити елемент
+ * @param {number} id - ID елемента для видалення
+ * @returns {Promise<void>}
+ */
+async function deleteItem(id) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+      method: 'DELETE',
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Помилка при видаленні: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('Помилка в deleteItem:', error);
+    throw error;
+  }
+}
+
+/**
+ * Побудувати query string з параметрів
+ * @param {Object} params
+ * @returns {string}
+ */
+function buildQueryString(params = {}) {
+  const searchParams = new URLSearchParams();
+  
+  if (params.q) searchParams.set('q', params.q);
+  if (params.category && params.category !== 'all') {
+    searchParams.set('category', params.category);
+  }
+  if (params._sort) searchParams.set('_sort', params._sort);
+  if (params._order) searchParams.set('_order', params._order);
+  if (params._page) searchParams.set('_page', params._page);
+  if (params._limit) searchParams.set('_limit', params._limit);
+  
+  return searchParams.toString();
+}
+
+/**
+ * Отримати унікальні категорії з даних
+ * @param {Array} items - Масив елементів
+ * @returns {Array}
+ */
+function getCategories(items) {
+  if (!Array.isArray(items)) return ['all'];
+  const categories = [...new Set(items.map((p) => p.category).filter(Boolean))];
+  return ['all', ...categories];
 }

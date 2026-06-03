@@ -1,19 +1,50 @@
 /**
- * catalog.js - Логика рендеринга и управления каталогом
+ * catalog.js - Логіка рендеринга та керування каталогом через REST API
  */
 
 const ITEMS_PER_PAGE = 6;
 let catalogState = {
-  allProjects: [],
-  filteredProjects: [],
-  displayedProjects: [],
+  allItems: [],
+  filteredItems: [],
+  displayedItems: [],
   currentPage: 1,
   searchQuery: '',
   selectedCategory: 'all',
   sortBy: 'date-newest',
+  sortOrder: 'DESC',
 };
 
-// Показать состояние загрузки
+/**
+ * Ініціалізація сторінки каталогу
+ */
+async function initCatalogPage() {
+  const container = document.querySelector('[data-catalog]');
+  if (!container) return;
+
+  try {
+    showLoadingState();
+
+    // Завантажити дані з API
+    catalogState.allItems = await getItems();
+
+    if (catalogState.allItems.length === 0) {
+      showEmptyState();
+      return;
+    }
+
+    // Ініціалізувати контролі фільтрації
+    initCatalogControls();
+
+    // Відобразити перший набір
+    applyFiltersAndSearch();
+  } catch (error) {
+    showErrorState(error.message);
+  }
+}
+
+/**
+ * Показати стан завантаження
+ */
 function showLoadingState() {
   const container = document.querySelector('[data-catalog]');
   if (!container) return;
@@ -26,7 +57,9 @@ function showLoadingState() {
   `;
 }
 
-// Показать состояние ошибки
+/**
+ * Показати стан помилки
+ */
 function showErrorState(error) {
   const container = document.querySelector('[data-catalog]');
   if (!container) return;
@@ -36,13 +69,16 @@ function showErrorState(error) {
       <h3>⚠️ Помилка при завантаженні</h3>
       <p>${error}</p>
       <button class="btn-primary" type="button" id="retry-button">Спробувати знову</button>
+      <a href="item-form.html" class="btn-primary">+ Додати новий проект</a>
     </div>
   `;
 
   document.getElementById('retry-button')?.addEventListener('click', initCatalogPage);
 }
 
-// Показать состояние пустого результата
+/**
+ * Показати стан порожнього результату
+ */
 function showEmptyState() {
   const container = document.querySelector('[data-catalog]');
   if (!container) return;
@@ -52,57 +88,52 @@ function showEmptyState() {
       <h3>😔 Нічого не знайдено</h3>
       <p>Спробуйте змінити параметри пошуку або фільтрів</p>
       <button class="btn-primary" type="button" id="clear-filters-button">Очистити фільтри</button>
+      <a href="item-form.html" class="btn-primary">+ Додати новий проект</a>
     </div>
   `;
 
   document.getElementById('clear-filters-button')?.addEventListener('click', resetFilters);
 }
 
-// Рендеринг карток проектов
-function renderProjects(projects) {
+/**
+ * Рендерити картки проектів
+ */
+function renderProjects(items) {
   const container = document.querySelector('[data-catalog]');
   if (!container) return;
 
-  if (projects.length === 0) {
+  if (items.length === 0) {
     showEmptyState();
     return;
   }
 
-  const cardsHTML = projects
-    .map((project) => {
-      const isFav = isFavorite(project.id);
+  const cardsHTML = items
+    .map((item) => {
+      const technologiesHTML = Array.isArray(item.technologies)
+        ? item.technologies.map((tech) => `<span class="tech-tag">${tech}</span>`).join('')
+        : '';
+
       return `
-        <article class="project-card" data-project-id="${project.id}">
+        <article class="project-card" data-project-id="${item.id}">
           <div class="project-card__image">
-            <img src="${project.image}" alt="${project.title}" loading="lazy">
-            <div class="project-card__badge">${project.level}</div>
-            <button 
-              class="project-card__favorite ${isFav ? 'is-favorite' : ''}" 
-              type="button" 
-              aria-label="Додати в обране"
-              data-favorite-btn
-            >
-              ♥
-            </button>
+            <img src="${item.image}" alt="${item.title}" loading="lazy">
+            <div class="project-card__badge">${item.level}</div>
           </div>
           <div class="project-card__content">
-            <h3 class="project-card__title">${project.title}</h3>
-            <p class="project-card__category">${project.category}</p>
-            <p class="project-card__description">${project.description}</p>
+            <h3 class="project-card__title">${item.title}</h3>
+            <p class="project-card__category">${item.category}</p>
+            <p class="project-card__description">${item.description}</p>
             <div class="project-card__meta">
-              <span class="project-card__rating">⭐ ${project.rating}</span>
-              <span class="project-card__date">${new Date(project.date).toLocaleDateString('uk-UA')}</span>
+              <span class="project-card__rating">⭐ ${item.rating}</span>
+              <span class="project-card__date">${new Date(item.date).toLocaleDateString('uk-UA')}</span>
             </div>
             <div class="project-card__technologies">
-              ${project.technologies.map((tech) => `<span class="tech-tag">${tech}</span>`).join('')}
+              ${technologiesHTML}
             </div>
-            <button 
-              class="btn-primary project-card__btn" 
-              type="button"
-              data-details-btn
-            >
-              Детально
-            </button>
+            <div class="project-card__actions">
+              <a href="item-form.html?id=${item.id}" class="btn-primary">Редагувати</a>
+              <button class="btn-danger" type="button" data-delete-btn="${item.id}">Видалити</button>
+            </div>
           </div>
         </article>
       `;
@@ -115,16 +146,18 @@ function renderProjects(projects) {
     </div>
   `;
 
-  // Добавить обработчики событий
+  // Ініціалізувати обробники подій
   initCardEventHandlers();
 }
 
-// Рендеринг пагинации
+/**
+ * Рендерити пагінацію
+ */
 function renderPagination() {
   const container = document.querySelector('[data-pagination]');
   if (!container) return;
 
-  const totalPages = Math.ceil(catalogState.filteredProjects.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(catalogState.filteredItems.length / ITEMS_PER_PAGE);
 
   if (totalPages <= 1) {
     container.innerHTML = '';
@@ -133,14 +166,14 @@ function renderPagination() {
 
   let html = '<div class="pagination">';
 
-  // Кнопка "Предыдущая"
+  // Кнопка "Назад"
   if (catalogState.currentPage > 1) {
     html += `
       <button class="btn-pagination" type="button" data-page="prev">← Назад</button>
     `;
   }
 
-  // Номера страниц
+  // Номери сторінок
   for (let i = 1; i <= totalPages; i++) {
     const activeClass = i === catalogState.currentPage ? 'is-active' : '';
     html += `
@@ -148,7 +181,7 @@ function renderPagination() {
     `;
   }
 
-  // Кнопка "Следующая"
+  // Кнопка "Далі"
   if (catalogState.currentPage < totalPages) {
     html += `
       <button class="btn-pagination" type="button" data-page="next">Далі →</button>
@@ -158,13 +191,15 @@ function renderPagination() {
   html += '</div>';
   container.innerHTML = html;
 
-  // Добавить обработчики
+  // Ініціалізувати обробники
   container.querySelectorAll('button').forEach((btn) => {
     btn.addEventListener('click', handlePaginationClick);
   });
 }
 
-// Обработка клика по пагинации
+/**
+ * Обробити клік по пагінації
+ */
 function handlePaginationClick(e) {
   const btn = e.target;
   const page = btn.dataset.page;
@@ -172,7 +207,7 @@ function handlePaginationClick(e) {
   if (page === 'prev') {
     catalogState.currentPage = Math.max(1, catalogState.currentPage - 1);
   } else if (page === 'next') {
-    const totalPages = Math.ceil(catalogState.filteredProjects.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(catalogState.filteredItems.length / ITEMS_PER_PAGE);
     catalogState.currentPage = Math.min(totalPages, catalogState.currentPage + 1);
   } else {
     catalogState.currentPage = parseInt(page);
@@ -182,40 +217,96 @@ function handlePaginationClick(e) {
   window.scrollTo({ top: document.querySelector('[data-catalog]')?.offsetTop - 100, behavior: 'smooth' });
 }
 
-// Обновить отображение каталога
+/**
+ * Оновити відображення каталогу
+ */
 function updateCatalogDisplay() {
   const start = (catalogState.currentPage - 1) * ITEMS_PER_PAGE;
   const end = start + ITEMS_PER_PAGE;
-  catalogState.displayedProjects = catalogState.filteredProjects.slice(start, end);
+  catalogState.displayedItems = catalogState.filteredItems.slice(start, end);
 
-  renderProjects(catalogState.displayedProjects);
+  renderProjects(catalogState.displayedItems);
   renderPagination();
 }
 
-// Применить фильтры и поиск
+/**
+ * Застосувати фільтри та пошук (клієнтська фільтрація для локальних даних)
+ */
 function applyFiltersAndSearch() {
-  let filtered = filterProjects(
-    catalogState.allProjects,
-    catalogState.searchQuery,
-    catalogState.selectedCategory
-  );
+  let filtered = catalogState.allItems;
 
-  filtered = sortProjects(filtered, catalogState.sortBy);
+  // Фільтрація за пошуком
+  if (catalogState.searchQuery.trim()) {
+    const query = catalogState.searchQuery.toLowerCase();
+    filtered = filtered.filter(item => {
+      const matchesTitle = item.title.toLowerCase().includes(query);
+      const matchesDescription = item.description.toLowerCase().includes(query);
+      const matchesTech = Array.isArray(item.technologies) && 
+        item.technologies.some(tech => tech.toLowerCase().includes(query));
+      return matchesTitle || matchesDescription || matchesTech;
+    });
+  }
 
-  catalogState.filteredProjects = filtered;
+  // Фільтрація за категорією
+  if (catalogState.selectedCategory !== 'all') {
+    filtered = filtered.filter(item => item.category === catalogState.selectedCategory);
+  }
+
+  // Сортування
+  filtered = sortItems(filtered, catalogState.sortBy);
+
+  catalogState.filteredItems = filtered;
   catalogState.currentPage = 1;
 
   updateCatalogDisplay();
 }
 
-// Очистить фільтри
+/**
+ * Сортувати елементи
+ */
+function sortItems(items, sortBy) {
+  const copy = [...items];
+
+  switch (sortBy) {
+    case 'title-asc':
+      copy.sort((a, b) => a.title.localeCompare(b.title, 'uk'));
+      break;
+    case 'title-desc':
+      copy.sort((a, b) => b.title.localeCompare(a.title, 'uk'));
+      break;
+    case 'rating-desc':
+      copy.sort((a, b) => b.rating - a.rating);
+      break;
+    case 'rating-asc':
+      copy.sort((a, b) => a.rating - b.rating);
+      break;
+    case 'date-newest':
+      copy.sort((a, b) => new Date(b.date) - new Date(a.date));
+      break;
+    case 'date-oldest':
+      copy.sort((a, b) => new Date(a.date) - new Date(b.date));
+      break;
+    case 'level':
+      const levelOrder = { 'Новачок': 1, 'Середній': 2, 'Продвинений': 3 };
+      copy.sort((a, b) => (levelOrder[a.level] || 0) - (levelOrder[b.level] || 0));
+      break;
+    default:
+      break;
+  }
+
+  return copy;
+}
+
+/**
+ * Очистити фільтри
+ */
 function resetFilters() {
   catalogState.searchQuery = '';
   catalogState.selectedCategory = 'all';
   catalogState.sortBy = 'date-newest';
   catalogState.currentPage = 1;
 
-  // Обновить входные значения
+  // Оновити вхідні значення
   const searchInput = document.querySelector('[data-search]');
   const categorySelect = document.querySelector('[data-category-filter]');
   const sortSelect = document.querySelector('[data-sort]');
@@ -227,139 +318,38 @@ function resetFilters() {
   applyFiltersAndSearch();
 }
 
-// Инициализация обработчиков событий карточек
+/**
+ * Ініціалізувати обробники подій карток
+ */
 function initCardEventHandlers() {
-  // Обработчик избранного
-  document.querySelectorAll('[data-favorite-btn]').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const card = btn.closest('[data-project-id]');
-      const projectId = parseInt(card.dataset.projectId);
-
-      toggleFavorite(projectId);
-      btn.classList.toggle('is-favorite');
+  // Обробник видалення
+  document.querySelectorAll('[data-delete-btn]').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const itemId = parseInt(btn.dataset.deleteBtn);
+      if (confirm('Ви впевнені, що хочете видалити цей проект?')) {
+        try {
+          btn.disabled = true;
+          btn.textContent = 'Видалення...';
+          await deleteItem(itemId);
+          
+          // Оновити список
+          catalogState.allItems = catalogState.allItems.filter(item => item.id !== itemId);
+          applyFiltersAndSearch();
+        } catch (error) {
+          alert(`Помилка при видаленні: ${error.message}`);
+          btn.disabled = false;
+          btn.textContent = 'Видалити';
+        }
+      }
     });
   });
-
-  // Обработчик "Детально"
-  document.querySelectorAll('[data-details-btn]').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      const card = btn.closest('[data-project-id]');
-      const projectId = parseInt(card.dataset.projectId);
-      showProjectDetails(projectId);
-    });
-  });
 }
 
-// Показать детали проекта в модальном окне
-function showProjectDetails(projectId) {
-  const project = getProjectById(catalogState.allProjects, projectId);
-  if (!project) return;
-
-  const modal = document.querySelector('[data-details-modal]');
-  if (!modal) {
-    console.warn('Modal not found');
-    return;
-  }
-
-  const isFav = isFavorite(projectId);
-
-  const content = modal.querySelector('[data-modal-content]');
-  if (content) {
-    content.innerHTML = `
-      <div class="modal-header">
-        <h2>${project.title}</h2>
-        <button class="modal-close" type="button" aria-label="Закрити">×</button>
-      </div>
-      <div class="modal-body">
-        <img src="${project.image}" alt="${project.title}" class="modal-image">
-        <div class="project-details">
-          <p><strong>Категорія:</strong> ${project.category}</p>
-          <p><strong>Рівень:</strong> ${project.level}</p>
-          <p><strong>Рейтинг:</strong> ⭐ ${project.rating}</p>
-          <p><strong>Дата:</strong> ${new Date(project.date).toLocaleDateString('uk-UA')}</p>
-          <p><strong>Опис:</strong> ${project.description}</p>
-          <div class="technologies-list">
-            <strong>Технології:</strong>
-            ${project.technologies.map((tech) => `<span class="tech-tag">${tech}</span>`).join('')}
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button 
-          class="btn-primary ${isFav ? 'is-favorite' : ''}" 
-          type="button"
-          id="modal-favorite-btn"
-        >
-          ${isFav ? '♥ Видалити з обраного' : '♡ Додати в обране'}
-        </button>
-        <button class="btn-secondary modal-close-btn" type="button">Закрити</button>
-      </div>
-    `;
-  }
-
-  modal.hidden = false;
-
-  // Обработчики кнопок модального окна
-  modal.querySelector('.modal-close')?.addEventListener('click', () => {
-    modal.hidden = true;
-  });
-
-  modal.querySelector('.modal-close-btn')?.addEventListener('click', () => {
-    modal.hidden = true;
-  });
-
-  document.getElementById('modal-favorite-btn')?.addEventListener('click', () => {
-    toggleFavorite(projectId);
-    showProjectDetails(projectId); // Перерендерить
-  });
-
-  // Закрыть по нажатию Esc
-  const handleEsc = (e) => {
-    if (e.key === 'Escape') {
-      modal.hidden = true;
-      document.removeEventListener('keydown', handleEsc);
-    }
-  };
-  document.addEventListener('keydown', handleEsc);
-
-  // Закрыть по клику на фон
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.hidden = true;
-    }
-  });
-}
-
-// Инициализация каталога
-async function initCatalogPage() {
-  const container = document.querySelector('[data-catalog]');
-  if (!container) return;
-
-  try {
-    showLoadingState();
-
-    // Загрузить данные
-    catalogState.allProjects = await loadProjects();
-
-    if (catalogState.allProjects.length === 0) {
-      showEmptyState();
-      return;
-    }
-
-    // Инициализировать фильтры
-    initCatalogControls();
-
-    // Отобразить первый набор
-    applyFiltersAndSearch();
-  } catch (error) {
-    showErrorState(error.message);
-  }
-}
-
-// Инициализация элементов управления каталогом
+/**
+ * Ініціалізувати контролі каталогу
+ */
 function initCatalogControls() {
-  // Поиск
+  // Пошук
   const searchInput = document.querySelector('[data-search]');
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
@@ -368,7 +358,7 @@ function initCatalogControls() {
     });
   }
 
-  // Фильтр по категориям
+  // Фільтр за категоріями
   const categorySelect = document.querySelector('[data-category-filter]');
   if (categorySelect) {
     categorySelect.addEventListener('change', (e) => {
@@ -377,12 +367,23 @@ function initCatalogControls() {
     });
   }
 
-  // Сортировка
+  // Сортування
   const sortSelect = document.querySelector('[data-sort]');
   if (sortSelect) {
     sortSelect.addEventListener('change', (e) => {
       catalogState.sortBy = e.target.value;
       applyFiltersAndSearch();
     });
+  }
+
+  // Додати кнопку для створення нового проекту
+  const controlsSection = document.querySelector('.controls-section');
+  if (controlsSection && !controlsSection.querySelector('[href="item-form.html"]')) {
+    const addBtn = document.createElement('a');
+    addBtn.href = 'item-form.html';
+    addBtn.className = 'btn-primary';
+    addBtn.textContent = '+ Додати новий проект';
+    addBtn.style.marginLeft = 'auto';
+    controlsSection.querySelector('.controls-group')?.appendChild(addBtn);
   }
 }

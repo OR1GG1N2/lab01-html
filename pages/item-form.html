@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <link rel="stylesheet" href="../assets/styles/style.css">
+  <link rel="stylesheet" href="../assets/styles/responsive.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Форма керування проектом</title>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Відкрити меню">☰</button>
+
+    <nav class="main-nav">
+      <a href="../index.html">Головна</a>
+      <a href="about.html">Про мене</a>
+      <a href="catalog.html">Каталог</a>
+      <a href="contact.html">Контакти</a>
+      <a href="favorites.html">Обране</a>
+    </nav>
+
+    <button class="theme-toggle" type="button" aria-label="Перемкнути тему">Тема</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="card">
+    <h1 data-form-title>Додати новий проект</h1>
+  </div>
+
+  <!-- Форма для створення/редагування -->
+  <div class="card">
+    <form data-item-form id="itemForm">
+      
+      <div class="form-group">
+        <label for="title">Назва проекту *</label>
+        <input 
+          type="text" 
+          id="title" 
+          name="title" 
+          required 
+          placeholder="Введіть назву проекту"
+          aria-label="Назва проекту"
+        >
+        <span class="error-message" data-error="title"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Категорія *</label>
+        <select id="category" name="category" required aria-label="Виберіть категорію">
+          <option value="">Виберіть категорію</option>
+          <option value="frontend">Frontend</option>
+          <option value="backend">Backend</option>
+          <option value="design">Design</option>
+        </select>
+        <span class="error-message" data-error="category"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Опис *</label>
+        <textarea 
+          id="description" 
+          name="description" 
+          required 
+          rows="4" 
+          placeholder="Опишіть проект"
+          aria-label="Опис проекту"
+        ></textarea>
+        <span class="error-message" data-error="description"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="rating">Рейтинг (1-5) *</label>
+        <input 
+          type="number" 
+          id="rating" 
+          name="rating" 
+          min="1" 
+          max="5" 
+          step="0.1"
+          required
+          placeholder="4.5"
+          aria-label="Рейтинг проекту"
+        >
+        <span class="error-message" data-error="rating"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="level">Рівень складності *</label>
+        <select id="level" name="level" required aria-label="Виберіть рівень">
+          <option value="">Виберіть рівень</option>
+          <option value="Новачок">Новачок</option>
+          <option value="Середній">Середній</option>
+          <option value="Продвинений">Продвинений</option>
+        </select>
+        <span class="error-message" data-error="level"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="image">Посилання на зображення</label>
+        <input 
+          type="url" 
+          id="image" 
+          name="image" 
+          placeholder="https://example.com/image.jpg"
+          aria-label="URL зображення"
+        >
+        <span class="error-message" data-error="image"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="date">Дата *</label>
+        <input 
+          type="date" 
+          id="date" 
+          name="date" 
+          required
+          aria-label="Дата проекту"
+        >
+        <span class="error-message" data-error="date"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="technologies">Технології (розділені комами)</label>
+        <input 
+          type="text" 
+          id="technologies" 
+          name="technologies" 
+          placeholder="HTML, CSS, JavaScript"
+          aria-label="Технології"
+        >
+        <span class="error-message" data-error="technologies"></span>
+      </div>
+
+      <div class="form-group form-checkbox">
+        <input 
+          type="checkbox" 
+          id="featured" 
+          name="featured"
+          aria-label="Позначити як вибране"
+        >
+        <label for="featured">Позначити як вибране</label>
+      </div>
+
+      <!-- Повідомлення про статус -->
+      <div class="status-message" data-form-status hidden></div>
+
+      <!-- Кнопки -->
+      <div class="form-buttons">
+        <button type="submit" class="btn-primary" data-submit-btn>Зберегти</button>
+        <button type="button" class="btn-secondary" id="cancelBtn">Скасувати</button>
+      </div>
+    </form>
+  </div>
+
+</main>
+
+<button class="back-to-top" type="button" hidden>Вгору</button>
+
+<footer>
+  <p>&copy; 2026</p>
+</footer>
+
+<!-- Модальне вікно підтвердження видалення -->
+<div class="modal" data-delete-confirm hidden>
+  <div class="modal-overlay"></div>
+  <div class="modal-dialog" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h3>Видалити проект?</h3>
+      <p>Ця дія не може бути скасована.</p>
+      <div class="modal-buttons">
+        <button type="button" class="btn-secondary" data-cancel-delete>Скасувати</button>
+        <button type="button" class="btn-danger" data-confirm-delete>Видалити</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js" defer></script>
+<script src="../js/form.js" defer></script>
+<script src="../js/ui.js" defer></script>
+<script src="../js/main.js" defer></script>
+
+</body>
+</html>

@@ -9,7 +9,10 @@ async function init() {
   initFilters();
   initModal();
   initContactForm();
+  
+  // Ініціалізувати в залежності від сторінки
   await initCatalogPage();
+  await initItemFormPage();
 }
 
 function initActiveNav() {
