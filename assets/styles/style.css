@@ -66,6 +66,193 @@ nav a:hover::after {
   width: 100%;
 }
 
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.menu-toggle,
+.theme-toggle {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.menu-toggle {
+  display: none;
+  font-size: 20px;
+  padding: 10px 12px;
+}
+
+.theme-toggle {
+  padding: 10px 16px;
+}
+
+.main-nav a.is-active {
+  color: var(--accent);
+  
+}
+
+
+.main-nav * {
+  padding: 8px 12px;
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+}
+
+.filter-button.is-active {
+  background: var(--accent);
+  color: #111;
+  border-color: var(--accent);
+}
+
+.card-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.service-card {
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+}
+
+.accordion-section {
+  margin-top: 30px;
+}
+
+.accordion-item + .accordion-item {
+  margin-top: 14px;
+}
+
+.accordion-button {
+  width: 100%;
+  text-align: left;
+  padding: 16px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.accordion-panel {
+  padding: 16px;
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+/* Respect the `hidden` attribute so JS can hide the modal using `element.hidden = true` */
+.modal[hidden] {
+  display: none;
+}
+
+.modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.modal__content {
+  position: relative;
+  z-index: 1;
+  max-width: 90%;
+  width: min(500px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.modal__content img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent;
+  color: var(--text);
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.back-to-top {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.form-error {
+  color: #fca5a5;
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.character-counter {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.response-box {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+body.theme-light {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #475569;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --accent: #f59e0b;
+}
+
 /* ===== ТЕКСТ ===== */
 h1 {
   font-size: 40px;

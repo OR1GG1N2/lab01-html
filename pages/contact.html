@@ -9,12 +9,16 @@
 <body>
 
 <header>
-  <div class="container">
-    <nav>
+  <div class="container header-inner">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Відкрити меню">☰</button>
+
+    <nav class="main-nav">
       <a href="../index.html">Головна</a>
       <a href="about.html">Про мене</a>
       <a href="contact.html">Контакти</a>
     </nav>
+
+    <button class="theme-toggle" type="button" aria-label="Перемкнути тему">Тема</button>
   </div>
 </header>
 
@@ -23,16 +27,18 @@
   <div class="card">
     <h1>Контакти</h1>
 
-    <form action="#" method="get">
+    <form id="contact-form" action="#" method="get">
 
       <div class="form-group">
         <label for="name">Ім’я</label>
         <input id="name" name="name" type="text" required>
+        <p class="form-error" id="name-error" hidden></p>
       </div>
 
       <div class="form-group">
         <label for="email">Email</label>
         <input id="email" name="email" type="email" required>
+        <p class="form-error" id="email-error" hidden></p>
       </div>
 
       <div class="form-group">
@@ -57,20 +63,34 @@
       <div class="form-group">
         <label for="message">Повідомлення</label>
         <textarea id="message" name="message" rows="4"></textarea>
+        <p class="character-counter" id="message-count">0 / 500</p>
+        <p class="form-error" id="message-error" hidden></p>
       </div>
 
       <div class="form-group">
         <label>
-          <input type="checkbox" required> Згоден з правилами
+          <input id="agree" type="checkbox" required> Згоден з правилами
         </label>
       </div>
 
       <button type="submit">Надіслати</button>
-
+      <div class="response-box" id="contact-result" hidden></div>
     </form>
   </div>
 
 </main>
+
+<div class="modal" hidden>
+  <div class="modal__overlay"></div>
+  <div class="modal__content" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Закрити">×</button>
+    <img src="" alt="">
+    <p class="modal-caption"></p>
+  </div>
+</div>
+
+<button class="back-to-top" type="button" hidden>Вгору</button>
+<script src="../js/main.js" defer></script>
 
 <footer>
   <p>&copy; 2026</p>

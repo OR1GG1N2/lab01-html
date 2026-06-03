@@ -3,6 +3,7 @@
 <head>
   <link rel="stylesheet" href="./assets/styles/style.css">
   <link rel="stylesheet" href="./assets/styles/responsive.css">
+  
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,12 +13,16 @@
 <body>
 
 <header>
-  <div class="container">
-    <nav>
+  <div class="container header-inner">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Відкрити меню">☰</button>
+
+    <nav class="main-nav">
       <a href="index.html">Головна</a>
       <a href="pages/about.html">Про мене</a>
       <a href="pages/contact.html">Контакти</a>
     </nav>
+
+    <button class="theme-toggle" type="button" aria-label="Перемкнути тему">Тема</button>
   </div>
 </header>
 
@@ -50,10 +55,57 @@
 
   <div class="card">
     <figure>
-      <img src="assets/img/test.jpg" alt="Зображення">
+      <img id="hero-image" src="assets/img/test.jpg" alt="Зображення">
       <figcaption>Моє зображення</figcaption>
     </figure>
   </div>
+
+  <div class="card">
+    <h2>Портфоліо</h2>
+    <div class="filter-group" aria-label="Фільтр категорій">
+      <button type="button" class="filter-button is-active" data-filter="all">Усі </button>
+      <button type="button" class="filter-button" data-filter="learning">Навчання </button>
+      <button type="button" class="filter-button" data-filter="projects">Проєкти </button>
+      <button type="button" class="filter-button" data-filter="media">Медіа </button>
+    </div>
+
+    <div class="card-grid">
+      <article class="service-card" data-category="learning">
+        <h3>Курс HTML</h3>
+        <p>Опис уроку з розмітки та структури.</p>
+      </article>
+      <article class="service-card" data-category="projects">
+        <h3>Мій проєкт</h3>
+        <p>Приклад портфоліо з практичним сайтом.</p>
+      </article>
+      <article class="service-card" data-category="media">
+        <h3>Медіа</h3>
+        <p>Відео та аудіо приклади.</p>
+      </article>
+    </div>
+  </div>
+
+  <section class="accordion-section card">
+    <h2>FAQ</h2>
+    <div class="accordion-item">
+      <button class="accordion-button" type="button" aria-expanded="false">Як почати роботу з сайтом?</button>
+      <div class="accordion-panel" hidden>
+        <p>Використовуйте меню для навігації або перейдіть на потрібну сторінку.</p>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-button" type="button" aria-expanded="false">Як змінити тему?</button>
+      <div class="accordion-panel" hidden>
+        <p>Натисніть кнопку «Тема» у верхньому меню, щоб перемкнути світлу або темну тему.</p>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-button" type="button" aria-expanded="false">Як повернутися нагору?</button>
+      <div class="accordion-panel" hidden>
+        <p>Після прокрутки сторінки з’явиться кнопка «Вгору», вона плавно підніме вас до початку.</p>
+      </div>
+    </div>
+  </section>
 
   <div class="card">
     <table>
@@ -69,6 +121,18 @@
   </div>
 
 </main>
+
+<div class="modal" hidden>
+  <div class="modal__overlay"></div>
+  <div class="modal__content" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Закрити">×</button>
+    <img src="" alt="">
+    <p class="modal-caption"></p>
+  </div>
+</div>
+
+<button class="back-to-top" type="button" hidden>Вгору</button>
+<script src="./js/main.js" defer></script>
 
 <footer>
   <p>&copy; 2026</p>

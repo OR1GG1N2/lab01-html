@@ -9,12 +9,16 @@
 <body>
 
 <header>
-  <div class="container">
-    <nav>
+  <div class="container header-inner">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Відкрити меню">☰</button>
+
+    <nav class="main-nav">
       <a href="../index.html">Головна</a>
       <a href="about.html">Про мене</a>
       <a href="contact.html">Контакти</a>
     </nav>
+
+    <button class="theme-toggle" type="button" aria-label="Перемкнути тему">Тема</button>
   </div>
 </header>
 
@@ -45,6 +49,18 @@
   </div>
 
 </main>
+
+<div class="modal" hidden>
+  <div class="modal__overlay"></div>
+  <div class="modal__content" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Закрити">×</button>
+    <img src="" alt="">
+    <p class="modal-caption"></p>
+  </div>
+</div>
+
+<button class="back-to-top" type="button" hidden>Вгору</button>
+<script src="../js/main.js" defer></script>
 
 <footer>
   <p>&copy; 2026</p>
